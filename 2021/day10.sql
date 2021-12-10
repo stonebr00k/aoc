@@ -3,14 +3,14 @@ declare @json nvarchar(max) = N'["' + replace(trim(nchar(10) from @input), nchar
 
 with line as (
     select id = cast([key] as tinyint)
-        ,string = replace(replace(replace(replace(cast([value] as varchar(200)),'()',''),'<>',''),'[]',''),'{}','')
+        ,string = cast([value] as varchar(200))
     from openjson(@json)
 )
 ,reducer as (
     select i = 1, id, string
     from line
     union all
-    select i = i + 1, id, replace(replace(replace(replace(string,'()',''),'<>',''),'[]',''),'{}','')
+    select i = i + 1, id, cast(replace(replace(replace(replace(string,'()',''),'<>',''),'[]',''),'{}','') as varchar(200))
     from reducer
     where charindex('[]', string) | charindex('{}', string) | charindex('()', string) | charindex('<>', string) > 0
 )
