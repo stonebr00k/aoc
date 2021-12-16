@@ -22,7 +22,7 @@ insert into @pair_count (iteration, pair, cnt)
     group by substring(@polymer_template, i.i, 2);
 
 declare @iteration tinyint = 1;
-while @iteration <= 40 begin;    
+while @iteration <= 40 begin;
     insert into @pair_count (iteration, pair, cnt)
         select iteration = @iteration
             ,pair = pr.repl
