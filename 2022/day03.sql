@@ -1,3 +1,4 @@
+/*  AoC 2022-03 (https://adventofcode.com/2022/day/3)  */
 declare @input varchar(max) = (select BulkColumn from openrowset(bulk 'c:/temp/aoc/2022/03.input', single_clob) d);
 set @input = replace(replace(trim(char(10) from @input), replicate(char(13) + char(10), 2), char(16)), char(13) + char(10), char(17));
 

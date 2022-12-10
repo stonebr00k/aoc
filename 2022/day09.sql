@@ -1,3 +1,4 @@
+/*  AoC 2022-09 (https://adventofcode.com/2022/day/9)  */
 declare @ varchar(max) = (select BulkColumn from openrowset(bulk 'c:/temp/aoc/2022/09.input', single_clob) d);
 set @ = '[["' + replace(replace(trim(char(10) from @), char(10), '],["'), ' ', '",') + ']]';
 drop table if exists #pos;

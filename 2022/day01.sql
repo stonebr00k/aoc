@@ -1,3 +1,4 @@
+/*  AoC 2022-01 (https://adventofcode.com/2022/day/1)  */
 declare @input nvarchar(max) = (select BulkColumn from openrowset(bulk 'c:/temp/aoc/2022/01.input', single_clob) d);
 
 -- Transform list to json

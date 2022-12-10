@@ -1,3 +1,4 @@
+/*  AoC 2022-06 (https://adventofcode.com/2022/day/6)  */
 declare @ varchar(max) = trim(nchar(10) from (select BulkColumn from openrowset(bulk 'c:/temp/aoc/2022/06.input', single_clob) d));
 
 select part = p.n

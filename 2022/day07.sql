@@ -1,3 +1,4 @@
+/*  AoC 2022-07 (https://adventofcode.com/2022/day/7)  */
 declare @ varchar(max) = trim(nchar(10) from (select BulkColumn from openrowset(bulk 'c:/temp/aoc/2022/07.input', single_clob) d));
 set @ = '[["' + replace(replace(@, ' ', '","'), char(10), '"],["') + N'"]]';
 

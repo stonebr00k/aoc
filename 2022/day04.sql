@@ -1,3 +1,4 @@
+/*  AoC 2022-04 (https://adventofcode.com/2022/day/4)  */
 declare @input varchar(max) = (select BulkColumn from openrowset(bulk 'c:/temp/aoc/2022/04.input', single_clob) d);
 set @input = '[[' + replace(replace(@input, '-', ','), char(10), '],[') + ']]';
 
