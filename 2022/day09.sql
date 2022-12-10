@@ -50,9 +50,9 @@ select part1 = sum(iif(k = 1, 1, 0))
     ,part2 = sum(iif(k = 9, 1, 0))
 from (select distinct k, x, y from #pos where k in (1, 9)) p1;
 
-/* Visualization of part 2 - run this query in SSMS and go to "Spatial results" tab:
-    select point = geometry::Point(x, y, 0).STBuffer(0.4)
-    from (select distinct k, x, y, i = min(i) from #pos group by k, x, y) x
-    where k = 2
-    order by k, i;
+/* Visualization of all knots - run this query in SSMS and go to "Spatial results" tab:
+    select k
+        ,ls = geometry::STGeomFromText(N'LINESTRING(' + string_agg(cast(x as varchar(max)) + ' ' + cast(y as varchar(13)), ',') within group (order by i) + N')', 0)
+    from #pos 
+    group by k
 */
