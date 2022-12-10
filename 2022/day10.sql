@@ -8,16 +8,16 @@ with execution as (
         ,sp = 1 + isnull(sum(cm*v) over(order by ni, cm rows between unbounded preceding and 1 preceding), 0)
     from openjson(@) j
     cross apply (values(
-        cast(j.[key] as int),
-        json_value(j.[value], '$[0]'),
+        cast(j.[key] as int), 
+        json_value(j.[value], '$[0]'), 
         json_value(j.[value], '$[1]')
     )) p(ni, i, v)
-    join (values('noop', 0),('addx', 0),('addx', 1)) c(i, cm)
+    join (values('noop', 0),('addx', 0),('addx', 1)) c(i, cm) 
         on p.i = c.i
 )
 
 select part1 = sum(iif(c in (20,60,100,140,180,220), c*sp, 0))
-    ,part2 = string_agg(iif(pp between sp-1 and sp+1, '#', '.') + iif(pp = 39, char(10), ''), '') within group(order by c)
+    ,part2 = string_agg(iif(pp between sp-1 and sp+1, N'▓', N'░') + iif(pp = 39, char(10), ''), '') within group(order by c)
 from execution;
 
 /* Visualisation of part 2 - Run in SSMS and go to "Spatial results" tab.
