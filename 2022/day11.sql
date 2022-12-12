@@ -1,3 +1,4 @@
+/*  AoC 2022-11 (https://adventofcode.com/2022/day/11)  */
 create or alter function dbo.solve (@part tinyint, @input nvarchar(max))
 returns table
 as return (
