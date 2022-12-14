@@ -3,7 +3,7 @@ create or alter function is_correct_array_order (@1 nvarchar(max), @2 nvarchar(m
 returns table as return (
     with compare as (
         select hid = cast('/' as nvarchar(max))
-            ,l = cast(@1 as nvarchar(max)) 
+            ,l = cast(@1 as nvarchar(max))
             ,r = cast(@2 as nvarchar(max))
             ,t = cast(4 as tinyint)
             ,x = null
