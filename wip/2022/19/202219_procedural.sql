@@ -34,7 +34,7 @@ create type evaluating as table (
 ) with(memory_optimized = on);
 go
 
-create or alter procedure blueprint_evaluator (@bluprints nvarchar(max), @part tinyint)
+create or alter procedure blueprint_evaluator (@blueprints nvarchar(max), @part tinyint)
 with native_compilation, schemabinding
 as begin atomic with (transaction isolation level = snapshot, language = N'us_english');
     declare @blueprint dbo.blueprint;
@@ -45,7 +45,7 @@ as begin atomic with (transaction isolation level = snapshot, language = N'us_en
         select id, or_ore_cost, cl_ore_cost, ob_ore_cost, ob_clay_cost, ge_ore_cost, ge_obsidian_cost
             ,max_ore_cost = max(x.oc)
             ,max_geode = 0
-        from openjson(@bluprints) with (
+        from openjson(@blueprints) with (
             id tinyint '$[0]',
             or_ore_cost decimal(4,1) '$[1]',
             cl_ore_cost decimal(4,1) '$[2]',
@@ -69,20 +69,15 @@ as begin atomic with (transaction isolation level = snapshot, language = N'us_en
             ,mins = @minutes
             ,orebots = 1, clybots = 0, obsbots = 0, geobots = 0
             ,ore = 0, clay = 0, obsidian = 0, geode = 0
-            ,is_orebots_maxed = 0
-            ,is_clybots_maxed = 0
-            ,is_obsbots_maxed = 0
+            ,is_orebots_maxed = 0, is_clybots_maxed = 0, is_obsbots_maxed = 0
         from @blueprint;
             
-    declare @itno tinyint = 1;
-    declare @rowcount bigint = 1;
-    declare @max_geode smallint;
-    declare @bpid tinyint = 1;
-    declare @max_bpid tinyint;
+    declare @itno tinyint = 1, @continue bit = 1, @max_geode smallint;
+    declare @bpid tinyint, @max_bpid tinyint;
 
     select @max_bpid = max(id) from @blueprint;
 
-    while @rowcount > 0 begin;
+    while @continue = 1 begin;
         insert into @eval (iteration,blueprint,mins,orebots,clybots,obsbots,geobots,ore,clay,obsidian,geode,is_orebots_maxed,is_clybots_maxed,is_obsbots_maxed)
             select iteration = @itno
                 ,blueprint = e.blueprint
@@ -96,17 +91,17 @@ as begin atomic with (transaction isolation level = snapshot, language = N'us_en
             join @blueprint bp on e.blueprint = bp.id
             cross apply (
                 select mins = e.mins - iif(x.mins > 0, x.mins, 1)
-                    ,orebots = e.orebots + iif([value] = 1, 1, 0)
-                    ,clybots = e.clybots + iif([value] = 2, 1, 0)
-                    ,obsbots = e.obsbots + iif([value] = 3, 1, 0)
-                    ,geobots = e.geobots + iif([value] = 4, 1, 0)
-                    ,ore = e.ore + (x.mins * e.orebots) - choose([value], or_ore_cost, cl_ore_cost, ob_ore_cost, ge_ore_cost)
-                    ,clay = e.clay + (x.mins * e.clybots) - choose([value], 0, 0, ob_clay_cost, 0)
-                    ,obsidian = e.obsidian + (x.mins * e.obsbots) - choose([value], 0, 0, 0, ge_obsidian_cost)
+                    ,orebots = e.orebots + iif(bot = 1, 1, 0)
+                    ,clybots = e.clybots + iif(bot = 2, 1, 0)
+                    ,obsbots = e.obsbots + iif(bot = 3, 1, 0)
+                    ,geobots = e.geobots + iif(bot = 4, 1, 0)
+                    ,ore = e.ore + (x.mins * e.orebots) - choose(bot, or_ore_cost, cl_ore_cost, ob_ore_cost, ge_ore_cost)
+                    ,clay = e.clay + (x.mins * e.clybots) - choose(bot, 0, 0, ob_clay_cost, 0)
+                    ,obsidian = e.obsidian + (x.mins * e.obsbots) - choose(bot, 0, 0, 0, ge_obsidian_cost)
                     ,geode = e.geode + (x.mins * e.geobots)
-                from (select 1 union all select 2 union all select 3 union all select 4) s([value])
+                from (select 1 union all select 2 union all select 3 union all select 4) s(bot)
                 cross apply (values(
-                    choose([value],
+                    choose(bot,
                         ceiling((or_ore_cost - e.ore) / nullif(e.orebots, 0)),
                         ceiling((cl_ore_cost - e.ore) / nullif(e.orebots, 0)),
                         iif(isnull(ceiling((ob_ore_cost - e.ore) / nullif(e.orebots, 0)), 99) > isnull(ceiling((ob_clay_cost - e.clay) / nullif(e.clybots, 0)), 99),
@@ -120,18 +115,17 @@ as begin atomic with (transaction isolation level = snapshot, language = N'us_en
                     ) + 1)
                 ) x(mins)
                 where x.mins <= e.mins
-                    and choose([value], is_orebots_maxed, is_clybots_maxed, is_obsbots_maxed, cast(0 as bit)) = cast(0 as bit)
+                    and choose(bot, is_orebots_maxed, is_clybots_maxed, is_obsbots_maxed, cast(0 as bit)) = cast(0 as bit)
             ) p
             where e.mins >= 0
                 and p.geode + p.geobots * p.mins + ((p.mins - 1) * p.mins / 2) > bp.max_geode
 
-        set @rowcount = @@rowcount;
+        set @continue = cast(@@rowcount as bit);
 
-        delete from @eval 
-        where iteration = @itno - 1;
+        if @continue = 1 delete from @eval where iteration = @itno - 1;
 
         set @bpid = 1;
-        while @bpid <= @max_bpid begin;
+        while @continue = 1 and @bpid <= @max_bpid begin;
             set @max_geode = 0;
 
             select @max_geode = max(geode) 
@@ -145,7 +139,7 @@ as begin atomic with (transaction isolation level = snapshot, language = N'us_en
             set @bpid += 1;
         end;
 
-        set @itno +=1
+        set @itno += 1;
     end;
 
     if @part = 1 begin;
