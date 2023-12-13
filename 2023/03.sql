@@ -1,5 +1,5 @@
 /*  AoC 2023-03 (https://adventofcode.com/2023/day/3)  */
-declare @ varchar(max) = replace((select BulkColumn from openrowset(bulk 'c:/temp/aoc/2023/03', single_clob)_), char(13), '');
+declare @ varchar(max) = replace((select BulkColumn from openrowset(bulk 'C:/repo/stonebr00k/aoc/input/2023/03', single_clob)_), char(13), '');
 
 with a as (
     select line = l.ordinal

@@ -1,5 +1,5 @@
 /*  AoC 2023-04 (https://adventofcode.com/2023/day/4)  */
-declare @ varchar(max) = (select BulkColumn from openrowset(bulk 'c:/temp/aoc/2023/04', single_clob)_);
+declare @ varchar(max) = (select BulkColumn from openrowset(bulk 'C:/repo/stonebr00k/aoc/input/2023/04', single_clob)_);
 
 declare @cards nvarchar(max) = (
     select [card].num

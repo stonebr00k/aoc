@@ -1,5 +1,5 @@
 /*  AoC 2023-07 (https://adventofcode.com/2023/day/7)  */
-declare @ nvarchar(max) = replace((select BulkColumn from openrowset(bulk 'c:/temp/aoc/2023/07', single_clob)_), char(13), '');
+declare @ nvarchar(max) = replace((select BulkColumn from openrowset(bulk 'C:/repo/stonebr00k/aoc/input/2023/07', single_clob)_), char(13), '');
 set @ = concat(N'[["', replace(replace(@, nchar(10), N'],["'), N' ', N'",'), N']]');
 
 with hand as (

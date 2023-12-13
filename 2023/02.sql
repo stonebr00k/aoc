@@ -1,5 +1,5 @@
 /*  AoC 2023-02 (https://adventofcode.com/2023/day/2)  */
-declare @ varchar(max) = (select BulkColumn from openrowset(bulk 'c:/temp/aoc/2023/02', single_clob)_);
+declare @ varchar(max) = (select BulkColumn from openrowset(bulk 'C:/repo/stonebr00k/aoc/input/2023/02', single_clob)_);
 set @ = concat('[{', replace(replace(replace(replace(@,'; ', N'","'),char(13) + char(10), '"]},{'),': ', ', "cubes":["'),'Game', '"game":'), '"]}]');
 
 with max_cubes as (

@@ -1,5 +1,5 @@
 /*  AoC 2023-01 (https://adventofcode.com/2023/day/1)  */
-declare @ varchar(max) = (select BulkColumn from openrowset(bulk 'c:/temp/aoc/2023/01', single_clob)_);
+declare @ varchar(max) = (select BulkColumn from openrowset(bulk 'C:/repo/stonebr00k/aoc/input/2023/01', single_clob)_);
 
 with calibration_values as (
     select top 1 with ties part = part.val

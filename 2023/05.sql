@@ -1,5 +1,5 @@
 /*  AoC 2023-05 (https://adventofcode.com/2023/day/5)  */
-declare @ nvarchar(max) = replace((select BulkColumn from openrowset(bulk 'c:/temp/aoc/2023/05', single_clob)_), nchar(13), N'');
+declare @ nvarchar(max) = replace((select BulkColumn from openrowset(bulk 'C:/repo/stonebr00k/aoc/input/2023/05', single_clob)_), nchar(13), N'');
 declare @json nvarchar(max) = concat(N'[', (
     select string_agg(concat(N'{"name":"', [name], N'"', N',', N'"values":[', lb, [values], rb, N']}'), N',')
     from string_split(replace(@, replicate(nchar(10), 2), nchar(17)), nchar(17), 1)
