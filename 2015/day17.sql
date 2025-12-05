@@ -1,4 +1,4 @@
-/*  AoC 2025-05 (https://adventofcode.com/2015/day/17)  */
+/*  AoC 2015-17 (https://adventofcode.com/2015/day/17)  */
 declare @input nvarchar(max); exec aoc.[get] N'input', 2015, 17, @input out, 0;
 
 drop table if exists #container;
